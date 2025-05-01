@@ -68,43 +68,19 @@ jobs:
 
               if [[ "$package_version" == *"SNAPSHOT"* ]]; then
                   local version_without_snapshot=$(echo "$package_version" | sed 's/SNAPSHOT//g')
-                  query="name:$package_name version:$version_without_snapshot*"
-
-                  echo "DEBUG:"
-                  echo "    package_name: $package_name"
-                  echo "    package_version: $package_version"
-                  echo "    version_without_snapshot: $version_without_snapshot"
-                  echo "    final query: $query" > /dev/stderr
-                  echo "Using snapshot query pattern: $query" > /dev/stderr
-
+                  query="name:$package_name AND version:$version_without_snapshot*"
+              
                   query_result=$(cloudsmith list packages --output-format json --query "$query" "$ORGANIZATION/$REPOSITORY" 2> /dev/null)
-
-                  echo "DEBUG: Raw cloudsmith JSON result:"
-                  echo "$query_result" | jq .
-
-                  echo "DEBUG: Step 1 - Extracted .data array:"
-                  echo "$query_result" | jq '.data'
-
-                  echo "DEBUG: Step 2 - Filtered .data array for versions starting with $version_without_snapshot:"
-                  echo "$query_result" | jq --arg version "$version_without_snapshot" '
-                      .data | map(select(.version | startswith($version)))'
-
-                  echo "DEBUG: Step 3 - Sorted filtered results:"
-                  echo "$query_result" | jq --arg version "$version_without_snapshot" '
-                      .data
-                      | map(select(.version | startswith($version)))
-                      | sort_by(.version) | reverse'
-
+              
                   filtered_result=$(echo "$query_result" | jq -r --arg version "$version_without_snapshot" '
                       .data
                       | map(select(.version | startswith($version)))
                       | sort_by(.version) | reverse
                       | first | .slug_perm')
-
-                  echo "DEBUG: Step 4 - Final slug_perm result:"
+              
                   echo "$filtered_result"
+              fi
 
-                  echo "$filtered_result"
               else
                   query="name:$package_name version:$package_version"
                   echo "Using release query pattern: $query" > /dev/stderr
