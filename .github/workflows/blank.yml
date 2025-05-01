@@ -36,8 +36,8 @@ jobs:
             <servers>
               <server>
                 <id>cloudsmith-repo</id>
-                <username>${{ secrets.CLOUDSMITH_USER }}</username>
-                <password>${{ secrets.CLOUDSMITH_API_KEY }}</password>
+                <username>m-varun</username>
+                <password>e919eb9b42f63d54c7a6a2866b90d5872f01ded4</password>
               </server>
             </servers>
           </settings>
@@ -51,8 +51,8 @@ jobs:
         id: wait-for-package-sync
         continue-on-error: true
         env:
-          ORGANIZATION: workspace-for-rajdeep
-          REPOSITORY: maven-test
+          ORGANIZATION: testcheck
+          REPOSITORY: qa
           PACKAGE_NAME: ${{ inputs.artifact-name }}
           PACKAGE_VERSION: ${{ inputs.version }}
           TIMEOUT: 120
